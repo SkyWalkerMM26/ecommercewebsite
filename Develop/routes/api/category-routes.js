@@ -16,9 +16,23 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   // find one category by its `id` value
   // be sure to include its associated Products
+  try {
+    const categoryInfo = await Category.findByPk(req.params.id, {
+      include: [{ model: Product,
+        attributes: ['product_name', 'price', 'stock'],
+      }]
+    });
+    if (!categoryInfo) {
+      res.status(404).json({ message: 'This category id does not exist' });
+      return;
+    }
+    res.status(200).json(categoryData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 router.post('/', (req, res) => {
